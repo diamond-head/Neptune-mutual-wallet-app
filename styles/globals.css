@@ -1,3 +1,10 @@
+:root {
+  --primary: #191626;
+  --white: #FFFFFF;
+  --black: #000000;
+  --text-primary: #0070f3;
+}
+
 html,
 body {
   padding: 0;
