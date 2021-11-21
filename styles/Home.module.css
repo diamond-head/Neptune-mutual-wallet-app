@@ -109,10 +109,11 @@
 .card .link {
   margin-top: 2em;
   cursor: pointer;
+  text-align: center;
 }
 
-.card .link > p {
-  color: var(--text-primary);
+.card .link > button {
+  color: var(--text-primary) !important;
   font-size: 1.275em;
   font-weight: 600;
   text-align: center;
