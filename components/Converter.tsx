@@ -23,16 +23,16 @@ export default function Converter({ setShow, ...props }: any) {
 
   const handleInputChange = (event: React.FormEvent<HTMLInputElement>): void => {
     const { name, valueAsNumber } = event.currentTarget;
-    const source: string = name;
+    const source: string = name.toUpperCase();
 
     let val: number = 0;
     let target: string = "";
   
-    if (name === 'nep') {
-      target = 'busd';
+    if (name === 'NEP') {
+      target = 'BUSD';
       val = parseFloat((valueAsNumber * CONVERSION_RATES['NEP'].BUSD).toFixed(2));
     } else {
-      target = 'nep';
+      target = 'NEP';
       val = parseFloat((valueAsNumber * CONVERSION_RATES['BUSD'].NEP).toFixed(2));
     }
 
@@ -40,12 +40,12 @@ export default function Converter({ setShow, ...props }: any) {
       ...prev,
       source: {
         ...prev.source,
-        name: source.toUpperCase(),
+        name: source,
         value: valueAsNumber,
       },
       target: {
         ...prev.target,
-        name: target.toUpperCase(),
+        name: target,
         value: val
       }
     }));
