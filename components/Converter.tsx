@@ -7,7 +7,7 @@ import { CONVERSION_RATES, CoinsEnum, SWAP_COIN } from '../constants/constants';
 
 interface IConversionField {
   name: string;
-  value: number;
+  value: string;
   title: string;
 }
 interface IConversionState {
@@ -17,23 +17,24 @@ interface IConversionState {
 
 export default function Converter({ setShow, ...props }: any) {
   const [conversion, setConversionValue] = React.useState<IConversionState>({
-    source: { name: CoinsEnum.NEP, value: 1, title: CoinsEnum.NEP },
-    target: { name: CoinsEnum.BUSD, value: CONVERSION_RATES['NEP'].BUSD, title: CoinsEnum.BUSD }
+    source: { name: CoinsEnum.NEP, value: "1", title: CoinsEnum.NEP },
+    target: { name: CoinsEnum.BUSD, value: CONVERSION_RATES['NEP'].BUSD.toString(), title: CoinsEnum.BUSD }
   });
 
   const handleInputChange = (event: React.FormEvent<HTMLInputElement>): void => {
-    const { name, valueAsNumber } = event.currentTarget;
+    const { name, value } = event.currentTarget;
     const source: string = name.toUpperCase();
+    const parsedValue = parseFloat(value);
 
-    let val: number = 0;
+    let val: string;
     let target: string = "";
   
     if (name === 'NEP') {
       target = 'BUSD';
-      val = parseFloat((valueAsNumber * CONVERSION_RATES['NEP'].BUSD).toFixed(2));
+      val = parseFloat((parsedValue * CONVERSION_RATES['NEP'].BUSD).toFixed(2)).toString();
     } else {
       target = 'NEP';
-      val = parseFloat((valueAsNumber * CONVERSION_RATES['BUSD'].NEP).toFixed(2));
+      val = parseFloat((parsedValue * CONVERSION_RATES['BUSD'].NEP).toFixed(2)).toString();
     }
 
     setConversionValue((prev: IConversionState): IConversionState => ({
@@ -41,14 +42,15 @@ export default function Converter({ setShow, ...props }: any) {
       source: {
         ...prev.source,
         name: source,
-        value: valueAsNumber,
+        value,
       },
       target: {
         ...prev.target,
         name: target,
-        value: val
+        value: isNaN(parseFloat(val)) ? "" : val
       }
     }));
+
   }
 
   const handleSwapConversion = () => {
@@ -87,9 +89,9 @@ export default function Converter({ setShow, ...props }: any) {
                 <input
                   id="conversion-source"
                   className="form-control"
-                  type="number"
+                  type="text"
                   name={conversion.source.name}
-                  value={conversion.source.value}
+                  value={conversion.source.value.toString()}
                   onChange={handleInputChange}
                 />
               </div>
@@ -103,9 +105,9 @@ export default function Converter({ setShow, ...props }: any) {
                 <input
                   id="conversion-target"
                   className="form-control"
-                  type="number"
+                  type="text"
                   name={conversion.target.name}
-                  value={conversion.target.value}
+                  value={conversion.target.value.toString()}
                   onChange={handleInputChange}
                 />
               </div>
