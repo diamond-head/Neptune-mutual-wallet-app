@@ -25,3 +25,7 @@ a {
 .display-none {
   display: none !important;
 }
+
+body .modal {
+  top: 30% !important;
+}

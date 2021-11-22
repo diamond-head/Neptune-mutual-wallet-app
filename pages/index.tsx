@@ -8,6 +8,7 @@ import WalletDetails from '../components/Modal';
 import SwapIcon from '../assets/icons/swap';
 import styles from '../styles/Home.module.css'
 import { CONVERSION_RATES, CoinsEnum, SWAP_COIN } from '../constants/constants';
+import mitt from 'next/dist/shared/lib/mitt';
 
 interface IConversionField {
   name: string;
@@ -20,24 +21,64 @@ interface IConversionState {
 };
 
 interface IWalletDetails {
-  data: Array<{ key: string, value: string }>;
+  data: Array<any>;
   show: boolean;
   isWalletConnected: boolean;
+  balance: string | undefined | null;
+  account: string | undefined | null;
+  chainId: number | undefined | null;
 };
 
 const Home: NextPage = () => {
-  const { activate, account, library, connector, active, deactivate } = useWeb3React();
+  const { activate, account, library, deactivate, chainId } = useWeb3React();
 
   const [walletDetails, setWalletDetails] = React.useState<IWalletDetails>({
     data: [],
     show: false,
-    isWalletConnected: false
+    isWalletConnected: false,
+    balance: undefined,
+    account: undefined,
+    chainId: undefined
   });
 
   const [conversion, setConversionValue] = React.useState<IConversionState>({
     source: { name: CoinsEnum.NEP, value: 1, title: CoinsEnum.NEP },
     target: { name: CoinsEnum.BUSD, value: CONVERSION_RATES['NEP'].BUSD, title: CoinsEnum.BUSD }
   });
+
+  React.useEffect((): any => {
+    let stale = false;
+    async function getBalance() {
+      if (!!account && !!library && !!chainId) {
+        console.log('inside ifff');
+        const data = [
+          { key: 'Account', value: account },
+          { key: 'Chain ID', value: chainId },
+        ];
+        console.log({ library });
+        try {
+          const balance = await library.eth.getBalance(account);
+          console.log('inside tryyyy');
+          if (!!balance) {
+            console.log('inside try ifff');
+            data.push({ key: 'Balance', value: balance });
+            if (!stale) setWalletDetails((prev) => ({ ...prev, balance, account, chainId, data }));
+          }
+        } catch (e) {
+          console.log('inside catch', { e });
+          if (!stale) setWalletDetails((prev) => ({ ...prev, balance: null, account, chainId }));
+        }
+      }
+    }
+
+    getBalance();
+
+    return () => {
+      console.log('inside return callback');
+      stale = true;
+      setWalletDetails((prev) => ({ ...prev, balance: null, account: null, chainId: null }))
+    }
+  }, [account, library, chainId]);
 
   const handleInputChange = (event: React.FormEvent<HTMLInputElement>): void => {
     const { name, valueAsNumber } = event.currentTarget;
@@ -113,7 +154,7 @@ const Home: NextPage = () => {
     connectToMetaMask().then((res) => {
       setWalletDetails((prev) => ({
         ...prev,
-        isWalletConnected: true
+        isWalletConnected: true,
       }));
     });
   }
@@ -234,14 +275,11 @@ const Home: NextPage = () => {
           headerProps={{ title: 'Wallet Details', onClose: handleModalClose }}
           footerProps={{
             primary: {
-              label: 'Connect now', 
+              label: walletDetails.isWalletConnected ? "Disconnect" : 'Connect now', 
               callback: handlePrimaryButtonCallback, 
-              classes: walletDetails.isWalletConnected ? 'btn-danger' : 'btn-primary'
+              classes: walletDetails.isWalletConnected ? 'btn-danger w-100' : 'btn-primary'
             },
-            secondary: {
-              label: 'Cancel',
-              callback: handleCancel,
-            }
+            ...(!walletDetails.isWalletConnected && { secondary: { label: 'Cancel', callback: handleCancel} })
           }}
         >
           {walletDetails.isWalletConnected && (

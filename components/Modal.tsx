@@ -24,11 +24,11 @@ export default function CustomModal({ show, modalId, headerProps, children, foot
         </Button>
         <Button
           type="button"
-          variant={secondary.variant || 'light'}
+          variant={secondary?.variant || 'light'}
           className={!!secondary ? "" : 'display-none'}
-          onClick={secondary.callback}
+          onClick={secondary?.callback}
         >
-          {secondary.label}
+          {secondary?.label}
         </Button>
       </Modal.Footer>
     </Modal>

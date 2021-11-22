@@ -119,6 +119,17 @@
   text-align: center;
 }
 
+.details-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.details-wrapper div.details-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
 @media (max-width: 600px) {
   .grid {
     width: 100%;
